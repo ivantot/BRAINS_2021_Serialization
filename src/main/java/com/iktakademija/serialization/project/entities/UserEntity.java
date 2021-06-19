@@ -34,27 +34,34 @@ public class UserEntity {
 	@JsonView(Views.Public.class)
 	@JsonProperty("ID")
 	private Integer id;
+	
 	@JsonView(Views.Public.class)
 	@Column(nullable = false)
 	private String name;
+	
 	@JsonView(Views.Admin.class)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy") // primer custom ser / deser u materijalu
 	@Column(nullable = false)
 	private LocalDate dateOfBirth;
+	
 	@JsonView(Views.Admin.class)
 	@Column(nullable = false)
 	private String email;
+	
 	@JsonIgnore
 	@Column(nullable = false)
 	@JsonView(Views.Admin.class)
 	private String password;
+	
 	@Version
 	private Integer version;
-	@JsonManagedReference("my_reff")
+	
+	//@JsonManagedReference("my_reff")
 	@JsonView(Views.Private.class)
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "address")
 	private AddressEntity address;
+	
 	@JsonView(Views.Private.class)
 	@OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	private List<AccountEntity> accounts = new ArrayList<>();

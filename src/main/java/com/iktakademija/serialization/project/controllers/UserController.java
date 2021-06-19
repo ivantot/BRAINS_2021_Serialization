@@ -1,6 +1,7 @@
 package com.iktakademija.serialization.project.controllers;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import com.iktakademija.serialization.project.controllers.util.RESTError;
 import com.iktakademija.serialization.project.entities.UserEntity;
 import com.iktakademija.serialization.project.repositories.UserRepository;
 import com.iktakademija.serialization.project.security.Views;
+import com.iktakademija.serialization.project.service.UserService;
 
 @RestController
 @RequestMapping(path = "api/v1/users")
@@ -23,6 +25,9 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private UserService userService;
 
 	@RequestMapping(method = RequestMethod.GET, path = "/public")
 	@JsonView(Views.Public.class)
@@ -98,21 +103,33 @@ public class UserController {
 		userEntity.setEmail(userRegisterDTO.getEmail());
 		userEntity.setDateOfBirth(userRegisterDTO.getDateOfBirth());
 		userEntity.setPassword(userRegisterDTO.getPassword());
-		
+
 		return new ResponseEntity<UserEntity>(userRepository.save(userEntity), HttpStatus.CREATED);
 	}
-	/*
-		
-		//update
-		@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-		public ResponseEntity<?> updateUser(@PathVariable Integer userID, @RequestBody UserEntity user) {
-		return null;
+
+	//update
+	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
+	@JsonView(Views.Admin.class)
+	public ResponseEntity<?> updateUser(@PathVariable Integer userID, @RequestBody UserEntity user) {
+		//check for valid user input
+		if (userID == null) {
+			return new ResponseEntity<RESTError>(new RESTError(1, "User not found, please check the input!"),
+					HttpStatus.BAD_REQUEST);
 		}
-		
-		//delete
-		@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-		public ResponseEntity<?> removeUserbyID(@PathVariable Integer userID) {
-		return null;
+		return new ResponseEntity<UserEntity>(userService.updateUser(userID, user), HttpStatus.OK);
+	}
+
+	//delete
+	@JsonView(Views.Admin.class)
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+	public ResponseEntity<?> removeUserbyID(@PathVariable Integer userID) {
+		//check for valid user input
+		if (userID == null) {
+			return new ResponseEntity<RESTError>(new RESTError(1, "User not found, please check the input!"),
+					HttpStatus.BAD_REQUEST);
 		}
-		*/
+		UserEntity userForDeletion = userRepository.findById(userID).get();
+		userRepository.delete(userForDeletion);
+		return new ResponseEntity<UserEntity>(userForDeletion, HttpStatus.I_AM_A_TEAPOT);
+	}
 }

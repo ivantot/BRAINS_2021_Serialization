@@ -24,14 +24,18 @@ public class AccountEntity {
 	@GeneratedValue
 	@JsonView(Views.Private.class)
 	private Integer id;
+	
 	@Column(nullable = false)
 	@JsonView(Views.Private.class)
 	private String accountNo;
+	
 	@Column(nullable = false)
 	@JsonView(Views.Private.class)
 	private Double balance;
+	
 	@Version
 	private Integer version;
+	
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user")
 	private UserEntity user;

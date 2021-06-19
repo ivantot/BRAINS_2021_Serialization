@@ -29,19 +29,25 @@ public class AddressEntity {
 	@JsonProperty("ID")
 	@JsonView(Views.Private.class)
 	private Integer id;
+	
 	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	private String street;
+	
 	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	private String city;
+	
 	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	private String country;
-	@JsonBackReference("my_ref")
+	
+	@JsonView(Views.Admin.class)
+	//@JsonBackReference("my_ref")
 	@Column(nullable = false)
 	@OneToMany(mappedBy = "address", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	private List<UserEntity> users = new ArrayList<>();
+	
 	@Version
 	private Integer version;
 

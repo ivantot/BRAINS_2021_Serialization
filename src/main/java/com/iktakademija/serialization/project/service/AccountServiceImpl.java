@@ -1,5 +1,6 @@
 package com.iktakademija.serialization.project.service;
 
+import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class AccountServiceImpl implements AccountService {
 	private UserRepository userRepository;
 	@Autowired
 	private AccountRepository accountRepository;
-	
+
 	//utility method for generating random account numbers
 	public String generateRandomAcoountNumber() {
 		Random rand = new Random();
@@ -27,15 +28,16 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return card;
 	}
-/**
- * makes a new account and assigns to user, saves account and user in db
- * @return AccountEntity
- * @param Integer userID
- * 
- */
+
+	/**
+	 * makes a new account and assigns to user, saves account and user in db
+	 * @return AccountEntity
+	 * @param Integer userID
+	 * 
+	 */
 	@Override
 	public AccountEntity createAccount(Integer userID) {
-		
+
 		//check for valid input and user in db
 		if (userRepository.findById(userID).isPresent()) {
 			// create user
@@ -48,5 +50,28 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return null;
 	}
-	
+
+	@Override
+	public AccountEntity updateAccount(Integer accountID, AccountEntity account) {
+		// check for existance in db
+		Optional<AccountEntity> accountFromDB = accountRepository.findById(accountID);
+
+		if (accountFromDB.isPresent()) {
+			// update aaccount where parameters are valid
+			if (account.getAccountNo() != null) {
+				accountFromDB.get().setAccountNo(account.getAccountNo());
+			}
+			if (account.getBalance() != null) {
+				accountFromDB.get().setBalance(account.getBalance());
+			}
+			if (account.getUser() != null) {
+				accountFromDB.get().setUser(account.getUser());
+			}
+
+			//save updated account to db
+			accountRepository.save(accountFromDB.get());
+		}
+		return null;
+	}
+
 }
