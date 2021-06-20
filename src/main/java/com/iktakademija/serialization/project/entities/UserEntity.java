@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -56,16 +57,24 @@ public class UserEntity {
 	@Version
 	private Integer version;
 	
-	//@JsonManagedReference("my_reff")
+	@JsonManagedReference("1")
 	@JsonView(Views.Private.class)
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "address")
 	private AddressEntity address;
 	
+	@JsonBackReference("2")
 	@JsonView(Views.Private.class)
 	@OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	private List<AccountEntity> accounts = new ArrayList<>();
 
+	@JsonManagedReference("3")
+	@JsonView(Views.Private.class)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "employment")
+	private UserEmploymentEntity employment;
+	
+	
 	public UserEntity() {
 		// TODO Auto-generated constructor stub
 	}
@@ -125,5 +134,23 @@ public class UserEntity {
 	public void setAddress(AddressEntity address) {
 		this.address = address;
 	}
+
+	public List<AccountEntity> getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(List<AccountEntity> accounts) {
+		this.accounts = accounts;
+	}
+
+	public UserEmploymentEntity getEmployment() {
+		return employment;
+	}
+
+	public void setEmployment(UserEmploymentEntity employment) {
+		this.employment = employment;
+	}
+	
+	
 
 }

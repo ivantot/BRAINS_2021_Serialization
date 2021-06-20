@@ -8,6 +8,10 @@ public class Views {
 	public static class Private extends Public {
 	}
 
-	public static class Admin extends Private {
+	public static class CEO extends Private {
+
+	}
+
+	public static class Admin extends CEO {
 	}
 }

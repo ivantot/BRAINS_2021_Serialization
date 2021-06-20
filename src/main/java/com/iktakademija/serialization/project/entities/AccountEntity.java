@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iktakademija.serialization.project.security.Views;
 
@@ -36,6 +37,8 @@ public class AccountEntity {
 	@Version
 	private Integer version;
 	
+	@JsonManagedReference("2")
+	@JsonView(Views.Private.class)
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user")
 	private UserEntity user;
