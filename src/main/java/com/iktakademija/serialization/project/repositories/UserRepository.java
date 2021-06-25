@@ -9,5 +9,7 @@ import com.iktakademija.serialization.project.entities.UserEntity;
 public interface UserRepository extends CrudRepository<UserEntity, Integer> {
 	
 	Optional<UserEntity> findByEmail(String email);
+	
+	Optional<UserEntity> findByName(String name);
 
 }

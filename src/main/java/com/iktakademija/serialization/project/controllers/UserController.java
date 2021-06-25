@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.iktakademija.serialization.project.controllers.dto.DatabaseReportDTO;
 import com.iktakademija.serialization.project.controllers.dto.UserRegisterDTO;
+import com.iktakademija.serialization.project.controllers.dto.UserReportDTO;
 import com.iktakademija.serialization.project.controllers.util.RESTError;
 import com.iktakademija.serialization.project.entities.UserEntity;
+import com.iktakademija.serialization.project.repositories.UserEmploymentRepository;
 import com.iktakademija.serialization.project.repositories.UserRepository;
 import com.iktakademija.serialization.project.security.Views;
 import com.iktakademija.serialization.project.service.UserService;
@@ -28,6 +31,9 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private UserEmploymentRepository userEmploymentRepository;
 
 	@RequestMapping(method = RequestMethod.GET, path = "/public")
 	@JsonView(Views.Public.class)
@@ -132,4 +138,92 @@ public class UserController {
 		userRepository.delete(userForDeletion);
 		return new ResponseEntity<UserEntity>(userForDeletion, HttpStatus.I_AM_A_TEAPOT);
 	}
+
+	/**
+	 * controller returns specialized report for CEO on users that work within a single company 
+	 * 
+	 * @param takes a company name (String)
+	 * @return ResponseEntity with various http responses depending on result of logic
+	 */
+	// 3.1
+	@JsonView(Views.CEO.class)
+	@RequestMapping(method = RequestMethod.GET, value = "reports/CEO/{company}")
+	public ResponseEntity<?> getUserByCompanyCEO(@PathVariable String company) {
+
+		// check if company exists in db
+		if (userEmploymentRepository.findAllByCompany(company).isEmpty()) {
+			return new ResponseEntity<RESTError>(new RESTError(3, "Company not found in database."),
+					HttpStatus.NOT_FOUND);
+		}
+		// return company report if all checks pass
+		return new ResponseEntity<List<UserReportDTO>>(userService.findByCompany(company), HttpStatus.OK);
+	}
+
+	// 3.2
+	@JsonView(Views.Admin.class)
+	@RequestMapping(method = RequestMethod.GET, value = "reports/Admin/{company}")
+	public ResponseEntity<?> getUserByCompanyAdmin(@PathVariable String company) {
+
+		// check if company exists in db
+		if (userEmploymentRepository.findAllByCompany(company).isEmpty()) {
+			return new ResponseEntity<RESTError>(new RESTError(3, "Company not found in database."),
+					HttpStatus.NOT_FOUND);
+		}
+		// return company report if all checks pass
+		return new ResponseEntity<List<UserReportDTO>>(userService.findByCompany(company), HttpStatus.OK);
+	}
+
+	@JsonView(Views.Private.class)
+	@RequestMapping(method = RequestMethod.GET, value = "reports/Private/{company}")
+	public ResponseEntity<?> getUserByCompanyPrivate(@PathVariable String company) {
+
+		// check if company exists in db
+		if (userEmploymentRepository.findAllByCompany(company).isEmpty()) {
+			return new ResponseEntity<RESTError>(new RESTError(3, "Company not found in database."),
+					HttpStatus.NOT_FOUND);
+		}
+		// return company report if all checks pass
+		return new ResponseEntity<List<UserReportDTO>>(userService.findByCompany(company), HttpStatus.OK);
+	}
+
+	@JsonView(Views.Public.class)
+	@RequestMapping(method = RequestMethod.GET, value = "reports/Public/{company}")
+	public ResponseEntity<?> getUserByCompanyPublic(@PathVariable String company) {
+
+		// check if company exists in db
+		if (userEmploymentRepository.findAllByCompany(company).isEmpty()) {
+			return new ResponseEntity<RESTError>(new RESTError(3, "Company not found in database."),
+					HttpStatus.NOT_FOUND);
+		}
+		// return company report if all checks pass
+		return new ResponseEntity<List<UserReportDTO>>(userService.findByCompany(company), HttpStatus.OK);
+	}
+
+	// 3.3
+	@JsonView(Views.CEO.class)
+	@RequestMapping(method = RequestMethod.GET, value = "userReports/CEO/{name}")
+	public ResponseEntity<?> getUserReportCEO(@PathVariable String name) {
+
+		// check if name exists in db
+		if (userRepository.findByName(name).isEmpty()) {
+			return new ResponseEntity<RESTError>(new RESTError(123, "User not found in database."),
+					HttpStatus.NOT_FOUND);
+		}
+		// return report if all checks pass
+		return new ResponseEntity<DatabaseReportDTO>(userService.findByUser(name), HttpStatus.OK);
+	}
+
+	@JsonView(Views.Admin.class)
+	@RequestMapping(method = RequestMethod.GET, value = "userReports/Admin/{name}")
+	public ResponseEntity<?> getUserReportAdmin(@PathVariable String name) {
+
+		// check if name exists in db
+		if (userRepository.findByName(name).isEmpty()) {
+			return new ResponseEntity<RESTError>(new RESTError(123, "User not found in database."),
+					HttpStatus.NOT_FOUND);
+		}
+		// return report if all checks pass
+		return new ResponseEntity<DatabaseReportDTO>(userService.findByUser(name), HttpStatus.OK);
+	}
+
 }
